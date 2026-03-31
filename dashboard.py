@@ -29,7 +29,7 @@ import os
 # ---------------------------------------------------------------------------
 st.set_page_config(
     page_title="chaco 統合ダッシュボード",
-    page_icon="🐼",
+    page_icon="favicon.png",
     layout="wide",
 )
 
