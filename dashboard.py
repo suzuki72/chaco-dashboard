@@ -36,6 +36,29 @@ st.set_page_config(
 st.title("chaco 統合ダッシュボード")
 
 # ---------------------------------------------------------------------------
+# パスワード保護
+# ---------------------------------------------------------------------------
+def check_password():
+    """Streamlit Secrets に設定したパスワードで認証する。"""
+    if "password" not in st.secrets:
+        return True  # パスワード未設定なら素通し
+
+    if st.session_state.get("authenticated"):
+        return True
+
+    pwd = st.text_input("パスワードを入力してください", type="password")
+    if pwd:
+        if pwd == st.secrets["password"]:
+            st.session_state["authenticated"] = True
+            st.rerun()
+        else:
+            st.error("パスワードが正しくありません")
+    return False
+
+if not check_password():
+    st.stop()
+
+# ---------------------------------------------------------------------------
 # 設定値
 # ---------------------------------------------------------------------------
 # GA4 プロパティID（Google Analytics の管理画面で確認可能）
