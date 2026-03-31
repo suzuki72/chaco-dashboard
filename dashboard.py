@@ -93,7 +93,9 @@ else:
 # ---------------------------------------------------------------------------
 # データ取得（API接続 or モック）
 # ---------------------------------------------------------------------------
-use_api = os.path.exists(CREDENTIALS_FILE)
+# credentials.json（ローカル）または Streamlit Secrets（クラウド）があればAPI接続
+has_secrets = "google_token" in st.secrets if hasattr(st, "secrets") else False
+use_api = os.path.exists(CREDENTIALS_FILE) or has_secrets
 
 if use_api:
     st.sidebar.success("API接続: 有効")
