@@ -1,0 +1,9 @@
+streamlit>=1.30.0
+pandas
+plotly
+google-auth
+google-auth-oauthlib
+google-auth-httplib2
+google-api-python-client
+google-analytics-data
+google-analytics-admin
