@@ -74,7 +74,7 @@ CREDENTIALS_FILE = os.path.join(BASE_DIR, "credentials.json")
 # ---------------------------------------------------------------------------
 st.sidebar.header("設定")
 
-today = datetime(2026, 3, 31)
+today = datetime.now()
 default_start = today - timedelta(days=7)
 
 date_range = st.sidebar.date_input(
