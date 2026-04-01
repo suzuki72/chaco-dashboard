@@ -5,10 +5,10 @@
 API接続できない場合はモックデータにフォールバックする。
 
 データソース:
-    - GA4 Data API: chaco-memo / chaco38.com
+    - GA4 Data API: アプリ / Webサイト
     - AdMob API: アプリ広告収益
     - AdSense Management API: Web広告収益
-    - YouTube Analytics API: chaco ch
+    - YouTube Data API v3: チャンネル統計
 """
 
 import pandas as pd
@@ -23,7 +23,7 @@ def fetch_ga4_data(creds, property_id, start_date, end_date):
 
     Args:
         creds: Google OAuth2 認証情報
-        property_id: GA4 プロパティID（例: "properties/526208629"）
+        property_id: GA4 プロパティID（例: "properties/123456789"）
         start_date: 開始日（"YYYY-MM-DD"）
         end_date: 終了日（"YYYY-MM-DD"）
 
@@ -340,7 +340,7 @@ def fetch_youtube_channel_info(creds, channel_id=None):
 # モックデータ（API未接続時のフォールバック）
 # ---------------------------------------------------------------------------
 def get_mock_data():
-    """chaco-memo の実績値をベースにしたモックデータを返す。"""
+    """実績値をベースにしたモックデータを返す。"""
     dates = pd.date_range("2026-03-23", "2026-03-31")
     return pd.DataFrame({
         "日付": dates,

@@ -1,17 +1,17 @@
 """
-chaco 統合ダッシュボード
+統合ダッシュボード
 
 Google系サービスのデータを1画面で確認できるダッシュボード。
-credentials.json があれば実データ、なければモックデータで表示。
+credentials.json または Streamlit Secrets があれば実データ、なければモックデータで表示。
 
 使い方:
     streamlit run dashboard.py
 
 データソース (Phase 1):
-    - GA4: chaco-memo / chaco38.com
+    - GA4: アプリ / Webサイト
     - AdMob: アプリ広告収益・eCPM・CTR
     - AdSense: Web広告収益
-    - YouTube: chaco ch
+    - YouTube: チャンネル統計
 
 将来対応 (Phase 2):
     - LINE公式アカウント配信統計
@@ -32,12 +32,12 @@ _favicon_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "favico
 _page_icon = _favicon_path if os.path.exists(_favicon_path) else "📊"
 
 st.set_page_config(
-    page_title="chaco 統合ダッシュボード",
+    page_title="統合ダッシュボード",
     page_icon=_page_icon,
     layout="wide",
 )
 
-st.title("chaco 統合ダッシュボード")
+st.title("統合ダッシュボード")
 
 # ---------------------------------------------------------------------------
 # パスワード保護
@@ -63,12 +63,18 @@ if not check_password():
     st.stop()
 
 # ---------------------------------------------------------------------------
-# 設定値
+# 設定値（Streamlit Secrets から読み込み。ローカルはデフォルト値を使用）
 # ---------------------------------------------------------------------------
-# GA4 プロパティID（Google Analytics の管理画面で確認可能）
-GA4_PROPERTY_CHACOMEMO = "properties/526208629"   # chaco-memo アプリ
-GA4_PROPERTY_CHACO38 = "properties/397084446"       # chaco38.com（小人の世界: Chacoのスタンプ）
-YOUTUBE_CHANNEL_ID = "UC3r-zCwzrrzeKm1nEIvF0GA"   # Chaco38 (@chaco3881)
+def _get_config(key, default=""):
+    """Streamlit Secrets の [config] セクションから値を取得する。"""
+    try:
+        return st.secrets.get("config", {}).get(key, default)
+    except Exception:
+        return default
+
+GA4_PROPERTY_APP = _get_config("ga4_property_app", "")
+GA4_PROPERTY_WEB = _get_config("ga4_property_web", "")
+YOUTUBE_CHANNEL_ID = _get_config("youtube_channel_id", "")
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CREDENTIALS_FILE = os.path.join(BASE_DIR, "credentials.json")
@@ -118,11 +124,11 @@ else:
     st.sidebar.warning("モックデータで表示中")
     st.sidebar.caption("credentials.json を配置するとAPI接続に切り替わります")
 
-# --- GA4 (chaco-memo) ---
+# --- GA4 (アプリ) ---
 if use_api:
     try:
-        df_app = fetch_ga4_data(creds, GA4_PROPERTY_CHACOMEMO, start_date, end_date)
-        df_events = fetch_ga4_events(creds, GA4_PROPERTY_CHACOMEMO, start_date, end_date)
+        df_app = fetch_ga4_data(creds, GA4_PROPERTY_APP, start_date, end_date)
+        df_events = fetch_ga4_events(creds, GA4_PROPERTY_APP, start_date, end_date)
         app_data_source = "GA4 API"
     except Exception as e:
         st.sidebar.error(f"GA4エラー: {e}")
@@ -131,13 +137,13 @@ if use_api:
 else:
     df_app = None
 
-# --- GA4 (chaco38.com) ---
-if use_api and GA4_PROPERTY_CHACO38:
+# --- GA4 (Webサイト) ---
+if use_api and GA4_PROPERTY_WEB:
     try:
-        df_web_ga4 = fetch_ga4_data(creds, GA4_PROPERTY_CHACO38, start_date, end_date)
+        df_web_ga4 = fetch_ga4_data(creds, GA4_PROPERTY_WEB, start_date, end_date)
         web_data_source = "GA4 API"
     except Exception as e:
-        st.sidebar.error(f"GA4(chaco38)エラー: {e}")
+        st.sidebar.error(f"GA4(Web)エラー: {e}")
         df_web_ga4 = None
 else:
     df_web_ga4 = None
@@ -201,9 +207,9 @@ if df_youtube is None or len(df_youtube) == 0:
     youtube_data_source = "モック"
 
 # ---------------------------------------------------------------------------
-# セクション1: chaco-memo アプリ
+# セクション1: アプリ
 # ---------------------------------------------------------------------------
-st.header("📱 chaco-memo アプリ")
+st.header("📱 アプリ")
 st.caption(f"データソース: {app_data_source}")
 
 col1, col2, col3, col4 = st.columns(4)
@@ -323,9 +329,9 @@ fig_ctr.update_layout(height=250, margin=dict(t=40, b=20))
 st.plotly_chart(fig_ctr, use_container_width=True)
 
 # ---------------------------------------------------------------------------
-# セクション3: AdSense + chaco38.com
+# セクション3: AdSense + Webサイト
 # ---------------------------------------------------------------------------
-st.header("🌐 Web (chaco38.com)")
+st.header("🌐 Web")
 st.caption(f"データソース: {adsense_data_source}")
 
 col1, col2, col3 = st.columns(3)
@@ -368,9 +374,9 @@ fig_web.update_layout(
 st.plotly_chart(fig_web, use_container_width=True)
 
 # ---------------------------------------------------------------------------
-# セクション4: YouTube chaco ch
+# セクション4: YouTube
 # ---------------------------------------------------------------------------
-st.header("🎬 YouTube (chaco ch)")
+st.header("🎬 YouTube")
 st.caption(f"データソース: {youtube_data_source}")
 
 # チャンネル基本情報（API接続時）
