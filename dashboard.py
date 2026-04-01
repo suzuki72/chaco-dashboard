@@ -27,9 +27,13 @@ import os
 # ---------------------------------------------------------------------------
 # ページ設定
 # ---------------------------------------------------------------------------
+# favicon.png はローカルのみ保持（.gitignore対象）。クラウドでは絵文字にフォールバック
+_favicon_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "favicon.png")
+_page_icon = _favicon_path if os.path.exists(_favicon_path) else "📊"
+
 st.set_page_config(
     page_title="chaco 統合ダッシュボード",
-    page_icon="favicon.png",
+    page_icon=_page_icon,
     layout="wide",
 )
 

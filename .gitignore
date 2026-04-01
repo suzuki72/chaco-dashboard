@@ -5,6 +5,7 @@ __pycache__/
 .DS_Store
 .streamlit/
 CLAUDE.md
+favicon.png
 line_stamp_monthly_report.py
 *.docx
 *.Rhistory
